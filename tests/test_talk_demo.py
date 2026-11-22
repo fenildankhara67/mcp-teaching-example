@@ -1,4 +1,4 @@
-"""The talk demo: six stages in order, deterministic output (apart from trace ids and the temp path)."""
+"""The main demo: six stages in order, deterministic output (apart from trace ids and the temp path)."""
 import json
 import re
 import subprocess
@@ -33,7 +33,7 @@ def test_two_runs_identical_and_all_stages():
     assert "\033[" not in out  # piped output has no colour codes
 
 
-def test_demo_content_matches_the_talk_outline():
+def test_demo_content_matches_the_stage_outline():
     out = run().stdout
     assert "13 tools, 13 read-only" in out                       # 4a too much power
     assert "<untrusted_data>" in out and "nothing acted on it" in out  # 4b hidden instruction

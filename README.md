@@ -65,7 +65,7 @@ with the final outcome and one trace per call. Internal lookups write none. A re
 text when it is a string. Invalid calls count against the rate limit.
 Cost estimate: aliases are traced to real tables; a recursive CTE or other source that cannot be sized is refused with
 "unbounded or unknown size" instead of an invented number.
-Logs: `audit.jsonl` (override `CHINOOK_AUDIT_LOG`) and `trace.jsonl` (override `CHINOOK_TRACE_LOG`).
+Logs: `audit.jsonl` (override `CHINOOK_AUDIT_LOG`) and `trace.jsonl` (override `CHINOOK_TRACE_LOG`). `scripts/talk_demo.py` writes there too if they are set.
 
 ## Test
 ```sh
@@ -75,7 +75,7 @@ Covers write attempts, row cap, timeout, one audit line per call, tracing, cost 
 audit_tail isolation, the rate limit, the schema resource, the planted instruction, the over-privilege check
 and an end-to-end stdio test that lists tools and resources and calls every tool.
 
-## Demo (about a second of runtime)
+## Smaller demo: demo.py (about a second of runtime)
 ```sh
 .venv/bin/python scripts/demo.py
 ```
@@ -275,24 +275,20 @@ plus the sentence "This exact query was already refused once; change it instead 
 being allowed, resets the count. Settings: `CHINOOK_LOOP_WINDOW`, `CHINOOK_LOOP_WARN`, `CHINOOK_LOOP_BLOCK` or the `Guard(...)`
 arguments. Limits are in DESIGN_NOTES.md.
 
-## Running the talk demo
-`scripts/talk_demo.py` is the one entry point for the talk: six numbered stages in talk order (first server, the guard, who is asking,
-three things that go wrong, the loop, the repeated review), about a second, deterministic apart from trace ids. It calls the Guard
-methods that the MCP tools call (not a stdio client), so the output is true to the server; the stdio tests cover the real transport.
+## Demo
+`scripts/talk_demo.py` is the main demo: six numbered stages (first server, the guard, who is asking, three things that go wrong, the
+loop, the repeated review), about a second, deterministic apart from trace ids (shortened to 8 characters on screen). It calls the
+Guard methods that the MCP tools call (not a stdio client), so the output is true to the server; the stdio tests cover the real transport.
 ```sh
 .venv/bin/python scripts/talk_demo.py            # fast: everything at once
-.venv/bin/python scripts/talk_demo.py --pause    # live talk: Enter between stages
+.venv/bin/python scripts/talk_demo.py --pause    # waits for Enter between stages
 .venv/bin/python scripts/talk_demo.py --no-color # plain text (colour is also off when piped or NO_COLOR is set)
 ```
-Recorded-clip tip: set `CHINOOK_AUDIT_LOG` and `CHINOOK_TRACE_LOG` to files in a folder you can show on screen; the demo writes there
-instead of a temporary folder, and its summary counts only its own calls. Trace ids are shortened to 8 characters on screen.
-Older scripts still work: `demo.py` (first small demo), `debug_walkthrough.py` (debugging tools on the sample session),
-`repeat_review_demo.py` (the review routine over four windows). `talk_demo.py` replaces `demo.py` as the talk's main demo; the other two
-are deeper dives.
+Smaller walkthroughs: `demo.py`, `debug_walkthrough.py` and `repeat_review_demo.py`.
 
 Sample output:
 ```
-Chinook read-only MCP server: talk demo (music-store sample data; teaching example, not production safe)
+Chinook read-only MCP server: demo (music-store sample data; teaching example, not production safe)
 Legend: OK = allowed   REFUSED = guard said no   BLOCKED = loop guard stopped a repeat
 
 == 1. First server: three read-only tools ==
@@ -350,7 +346,7 @@ Legend: OK = allowed   REFUSED = guard said no   BLOCKED = loop guard stopped a 
    calls  ok  refused  blocked  traces
       18  12        5        1      18
    one audit line and one trace per call: 18 lines, 18 traces
-   logs: /tmp/chinook_talk_xxxx (temporary, removed when the demo ends)
+   logs: /tmp/chinook_demo_main_xxxx (temporary, removed when the demo ends)
 ```
 
 ## Cost guard

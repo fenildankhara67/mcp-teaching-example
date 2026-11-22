@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Talk demo: the whole example in talk order, six numbered stages (deterministic apart from trace ids).
+"""Main demo: the whole example in six numbered stages (deterministic apart from trace ids).
 
   1 first server   2 the guard   3 who is asking and what happened
   4 three things that go wrong   5 the loop   6 the repeated review
@@ -9,7 +9,7 @@ tests/test_stdio_client.py and tests/test_loop_guard.py cover the real stdio pat
 or to the files named by CHINOOK_AUDIT_LOG and CHINOOK_TRACE_LOG if you set them (handy for a recorded clip).
 
 Run:  .venv/bin/python scripts/talk_demo.py [--pause] [--fast] [--no-color]
-  --pause     wait for Enter between stages (live talks)
+  --pause     wait for Enter between stages 
   --fast      print everything at once (the default)
   --no-color  plain text (colour is also off when output is piped or NO_COLOR is set)
 """
@@ -191,7 +191,7 @@ class Talk:
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description="Talk demo for the Chinook read-only MCP example.")
+    ap = argparse.ArgumentParser(description="Main demo for the Chinook read-only MCP example.")
     ap.add_argument("--pause", action="store_true", help="wait for Enter between stages")
     ap.add_argument("--fast", action="store_true", help="print everything at once (default)")
     ap.add_argument("--no-color", action="store_true")
@@ -204,9 +204,9 @@ def main(argv=None) -> int:
     os.environ.pop("CHINOOK_RATE_LIMIT_PER_MIN", None)
     for v in ("CHINOOK_LOOP_WINDOW", "CHINOOK_LOOP_WARN", "CHINOOK_LOOP_BLOCK"):
         os.environ.pop(v, None)
-    with tempfile.TemporaryDirectory(prefix="chinook_talk_") as d:
+    with tempfile.TemporaryDirectory(prefix="chinook_demo_main_") as d:
         talk = Talk(color, pause, Path(d))
-        print("Chinook read-only MCP server: talk demo (music-store sample data; teaching example, not production safe)")
+        print("Chinook read-only MCP server: demo (music-store sample data; teaching example, not production safe)")
         print("Legend: " + talk.c("32", "OK") + " = allowed   " + talk.c("33", "REFUSED") + " = guard said no   "
               + talk.c("1;31", "BLOCKED") + " = loop guard stopped a repeat")
         for stage in (talk.stage1, talk.stage2, talk.stage3, talk.stage4, talk.stage5, talk.stage6):

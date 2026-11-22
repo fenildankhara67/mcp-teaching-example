@@ -85,11 +85,11 @@ OWASP mapping is only to sections of the cheat sheet I read earlier (see above);
 - Scripts: `seed_local.py` (local copy, planted row, caller map), `make_sample_session.py`, `download_db.sh`, `demo.py`, `debug_walkthrough.py`, `repeat_review_demo.py`.
 - Could the repeated review run over anything else here? Yes, over `sample_session/audit.jsonl` (the 32-call story): it also has a refused query repeated three times, but within one minute, so it does not split into four windows without regenerating it. A live `audit.jsonl` from a real server run would also work, but only for entries made by one caller id. No other data exists in the folder.
 
-# Additions: loop guard and talk demo
+# Additions: loop guard and main demo
 ## Loop guard
 - Implementation: `Guard._call` in `chinook_mcp/guard.py`. State is `(caller id, tool) -> [sha256, refusal times]`, hashes only. Warn at the 2nd refusal (extra sentence in the message; the audit detail keeps the plain reason), block from the 3rd call before any check runs (audit detail `repeated refused query (loop guard)`, span `loop_guard_check`). `explain_refusal` has a lookup entry for it; `recent_failures` and `call_stats` show it because they read the audit file (tested).
 - Limits: in-process only, lost on server restart, not shared between server processes; keyed on the unauthenticated caller id, so changing the id avoids it; matches exact query text only (add a space and it is a new hash); a different query to the same tool resets the streak, so alternating two refused queries is not caught (UNVERIFIED how an assistant would behave); blocked calls are not counted again, so after the window passes the query runs its checks again; calls rejected by input validation are not part of the loop guard. Not production safe.
 - Time is injectable (`Guard(clock=...)`) so the window tests do not sleep. The rate limit uses the same clock.
 - No new tool was added (still 13). I did not change the repeated-review demo data: it is an offline story and still reads true.
-## Talk demo
+## Main demo
 - `scripts/talk_demo.py` uses Guard methods, not stdio. Output is deterministic except for trace ids (shortened to 8 characters) and the temp folder name; the test normalises both. Colour only when stdout is a terminal.
